@@ -34,7 +34,9 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.fragment.IFragmentSpec;
+import org.thymeleaf.messageresolver.IMessageResolver;
 import org.thymeleaf.standard.StandardDialect;
+import org.thymeleaf.templatemode.ITemplateModeHandler;
 import org.thymeleaf.testing.templateengine.context.IProcessingContextBuilder;
 import org.thymeleaf.testing.templateengine.context.web.WebProcessingContextBuilder;
 import org.thymeleaf.testing.templateengine.engine.cache.TestCacheManager;
@@ -62,6 +64,8 @@ public final class TestExecutor {
     private ITestableResolver testableResolver = new StandardTestableResolver();
     private IProcessingContextBuilder processingContextBuilder = new WebProcessingContextBuilder(); 
     private List<IDialect> dialects = Collections.singletonList((IDialect)new StandardDialect());
+    private List<ITemplateModeHandler> templateModeHandlers = new ArrayList<ITemplateModeHandler>();
+    private IMessageResolver messageResolver = null;
     protected ITestReporter reporter = new ConsoleTestReporter();
     
     
@@ -139,9 +143,26 @@ public final class TestExecutor {
     public List<IDialect> getDialects() {
         return this.dialects;
     }
+    
+    public void addTemplateModeHandler(final ITemplateModeHandler templateModeHandler) {
+    	this.templateModeHandlers.add(templateModeHandler);
+    }
+	
+	public void setTemplateModeHandlers(final List<ITemplateModeHandler> templateModeHandlers) {
+    	this.templateModeHandlers = templateModeHandlers;
+    }
 
+    public List<ITemplateModeHandler> getTemplateModeHandlers() {
+    	return this.templateModeHandlers;
+    }
     
+    public void setMessageResolver(IMessageResolver messageResolver) {
+    	this.messageResolver = messageResolver;
+    }
     
+    public IMessageResolver getMessageResolver() {
+    	return this.messageResolver;
+    }
 
     
 
@@ -193,14 +214,21 @@ public final class TestExecutor {
         Validate.notNull(context, "Test execution context cannot be null");
         
         final TestEngineTemplateResolver templateResolver = new TestEngineTemplateResolver();
-        final TestEngineMessageResolver messageResolver = new TestEngineMessageResolver();
+        final TestEngineMessageResolver testMessageResolver = new TestEngineMessageResolver();
         final TestCacheManager cacheManager = new TestCacheManager();
         
         final TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
-        templateEngine.setMessageResolver(messageResolver);
+        if(this.messageResolver != null) {
+        	templateEngine.setMessageResolver(this.messageResolver);
+        } else {
+        	templateEngine.setMessageResolver(testMessageResolver);
+        }
         templateEngine.setDialects(new HashSet<IDialect>(this.dialects));
         templateEngine.setCacheManager(cacheManager);
+        for(ITemplateModeHandler templateModeHandler: this.templateModeHandlers) {
+        	templateEngine.addTemplateModeHandler(templateModeHandler);
+        }
         
         context.setTemplateEngine(templateEngine);
 
