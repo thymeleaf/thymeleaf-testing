@@ -33,15 +33,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import ognl.Ognl;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -209,29 +209,29 @@ public class WebProcessingContextBuilder implements IProcessingContextBuilder {
         Mockito.when(request.getProtocol()).thenReturn(protocol);
         Mockito.when(request.getScheme()).thenReturn(scheme);
         Mockito.when(request.getServerName()).thenReturn(serverName);
-        Mockito.when(Integer.valueOf(request.getServerPort())).thenReturn(Integer.valueOf(port));
+        Mockito.when(request.getServerPort()).thenReturn(port);
         Mockito.when(request.getContextPath()).thenReturn(contextName);
         Mockito.when(request.getServletPath()).thenReturn(servletPath);
         Mockito.when(request.getRequestURI()).thenReturn(requestURI);
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(requestURL));
         Mockito.when(request.getQueryString()).thenReturn(queryString);
         Mockito.when(request.getLocale()).thenReturn(locale);
-        Mockito.when(request.getLocales()).thenReturn(new ObjectEnumeration<Locale>(Arrays.asList(new Locale[]{locale})));
-        Mockito.when(Integer.valueOf(request.getContentLength())).thenReturn(Integer.valueOf(contentLength));
+        Mockito.when(request.getLocales()).thenReturn(new ObjectEnumeration<>(Arrays.asList(locale)));
+        Mockito.when(request.getContentLength()).thenReturn(contentLength);
         Mockito.when(request.getHeaderNames()).thenReturn(headerNames);
 
         Mockito.when(request.getSession()).thenReturn(session);
-        Mockito.when(request.getSession(Matchers.anyBoolean())).thenReturn(session);
+        Mockito.when(request.getSession(ArgumentMatchers.anyBoolean())).thenReturn(session);
 
         Mockito.when(request.getAttributeNames()).thenAnswer(new GetVariableNamesAnswer(attributes));
-        Mockito.when(request.getAttribute(Matchers.anyString())).thenAnswer(new GetAttributeAnswer(attributes));
-        Mockito.doAnswer(new SetAttributeAnswer(attributes)).when(request).setAttribute(Matchers.anyString(), Matchers.anyObject());
-        Mockito.doAnswer(new RemoveAttributeAnswer(attributes)).when(request).removeAttribute(Matchers.anyString());
+        Mockito.when(request.getAttribute(ArgumentMatchers.anyString())).thenAnswer(new GetAttributeAnswer(attributes));
+        Mockito.doAnswer(new SetAttributeAnswer(attributes)).when(request).setAttribute(ArgumentMatchers.anyString(), ArgumentMatchers.any());
+        Mockito.doAnswer(new RemoveAttributeAnswer(attributes)).when(request).removeAttribute(ArgumentMatchers.anyString());
 
         Mockito.when(request.getParameterNames()).thenAnswer(new GetVariableNamesAnswer(parameters));
-        Mockito.when(request.getParameterValues(Matchers.anyString())).thenAnswer(new GetParameterValuesAnswer(parameters));
+        Mockito.when(request.getParameterValues(ArgumentMatchers.anyString())).thenAnswer(new GetParameterValuesAnswer(parameters));
         Mockito.when(request.getParameterMap()).thenAnswer(new GetParameterMapAnswer(parameters));
-        Mockito.when(request.getParameter(Matchers.anyString())).thenAnswer(new GetParameterAnswer(parameters));
+        Mockito.when(request.getParameter(ArgumentMatchers.anyString())).thenAnswer(new GetParameterAnswer(parameters));
 
         
         return request;
@@ -247,9 +247,9 @@ public class WebProcessingContextBuilder implements IProcessingContextBuilder {
         Mockito.when(session.getServletContext()).thenReturn(context);
 
         Mockito.when(session.getAttributeNames()).thenAnswer(new GetVariableNamesAnswer(attributes));
-        Mockito.when(session.getAttribute(Matchers.anyString())).thenAnswer(new GetAttributeAnswer(attributes));
-        Mockito.doAnswer(new SetAttributeAnswer(attributes)).when(session).setAttribute(Matchers.anyString(), Matchers.anyObject());
-        Mockito.doAnswer(new RemoveAttributeAnswer(attributes)).when(session).removeAttribute(Matchers.anyString());
+        Mockito.when(session.getAttribute(ArgumentMatchers.anyString())).thenAnswer(new GetAttributeAnswer(attributes));
+        Mockito.doAnswer(new SetAttributeAnswer(attributes)).when(session).setAttribute(ArgumentMatchers.anyString(), ArgumentMatchers.any());
+        Mockito.doAnswer(new RemoveAttributeAnswer(attributes)).when(session).removeAttribute(ArgumentMatchers.anyString());
 
         return session;
         
@@ -259,7 +259,7 @@ public class WebProcessingContextBuilder implements IProcessingContextBuilder {
 
     static final HttpServletResponse createMockHttpServletResponse() {
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        Mockito.when(response.encodeURL(Matchers.anyString())).thenAnswer(new EncodeUrlAnswer());
+        Mockito.when(response.encodeURL(ArgumentMatchers.anyString())).thenAnswer(new EncodeUrlAnswer());
         return response;
     }
 
@@ -272,13 +272,13 @@ public class WebProcessingContextBuilder implements IProcessingContextBuilder {
         final ServletContext servletContext = Mockito.mock(ServletContext.class);
         
         Mockito.when(servletContext.getAttributeNames()).thenAnswer(new GetVariableNamesAnswer(attributes));
-        Mockito.when(servletContext.getAttribute(Matchers.anyString())).thenAnswer(new GetAttributeAnswer(attributes));
-        Mockito.doAnswer(new SetAttributeAnswer(attributes)).when(servletContext).setAttribute(Matchers.anyString(), Matchers.anyObject());
-        Mockito.doAnswer(new RemoveAttributeAnswer(attributes)).when(servletContext).removeAttribute(Matchers.anyString());
+        Mockito.when(servletContext.getAttribute(ArgumentMatchers.anyString())).thenAnswer(new GetAttributeAnswer(attributes));
+        Mockito.doAnswer(new SetAttributeAnswer(attributes)).when(servletContext).setAttribute(ArgumentMatchers.anyString(), ArgumentMatchers.any());
+        Mockito.doAnswer(new RemoveAttributeAnswer(attributes)).when(servletContext).removeAttribute(ArgumentMatchers.anyString());
         Mockito.when(servletContext.getContextPath()).thenReturn(contextName);
 
         Mockito.when(servletContext.getInitParameterNames()).thenReturn(new ObjectEnumeration<String>(null));
-        Mockito.when(servletContext.getInitParameter(Matchers.anyString())).thenReturn(null);
+        Mockito.when(servletContext.getInitParameter(ArgumentMatchers.anyString())).thenReturn(null);
         
         return servletContext;
     }
